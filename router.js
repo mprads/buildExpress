@@ -36,21 +36,27 @@ proto.route = function route(path) {
 proto.handle = function handle(req, res, out) {
     const self = this;
     const stack = self.stack;
-    const path = getPathname(req);
-
-    var layer, match, route;
     var index = 0;
 
-    // Iterate over the stack until you find a matching path then handle the request
-    while (!match && index < stack.length) {
-        layer = stack[index++];
-        match = matchLayer(layer, path);
-        route = layer.route;
+    next();
 
-        if (!match) continue;
-        if (!route) continue;
+    // Making use of js closures so that when next is called from the callback it has the current index and layer to resume
+    function next() {
+        const path = getPathname(req);
 
-        route.stack[0].handle_request(req, res);
+        var layer, match, route;
+
+        // Iterate over the stack until you find a matching path then handle the request
+        while (!match && index < stack.length) {
+            layer = stack[index++];
+            match = matchLayer(layer, path);
+            route = layer.route;
+
+            if (!match) continue;
+            if (!route) continue;
+
+            route.stack[0].handle_request(req, res, next);
+        };
     };
 };
 
