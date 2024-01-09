@@ -1,5 +1,6 @@
 const setPrototypeOf = require('setprototypeof');
 const parseUrl = require('parseurl');
+
 const Route = require('./route');
 const Layer = require('./layer');
 
@@ -57,8 +58,22 @@ proto.handle = function handle(req, res, out) {
 
             route.stack[0].handle_request(req, res, next);
         };
+
+        // Layer on stack but no route
+        if(match) {
+            layer.handle_request(req, res, next);
+        };
     };
 };
+
+proto.use = function use(fn) {
+    const layer = new Layer('/', {}, fn);
+
+    layer.route = undefined;
+    this.stack.push(layer);
+
+    return this
+}
 
 function getPathname(req) {
     try {

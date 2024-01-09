@@ -1,6 +1,7 @@
 const methods = require('methods');
 const http = require('http');
 
+const middleware = require('./middleware/init');
 const Router = require('./router');
 
 const app = exports = module.exports = {};
@@ -17,6 +18,9 @@ app.lazyrouter = function lazyrouter() {
     if(!this._router) {
         this._router = new Router({});
     }
+
+    // Setting up a layer at '/' that call the next function
+    this._router.use(middleware.init(this));
 };
 
 app.listen = function listen(...arugments) {

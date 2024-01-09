@@ -1,6 +1,8 @@
 const methods = require('methods');
-var Layer = require('./layer')
 const { flatten }  = require('array-flatten');
+
+var Layer = require('./layer')
+
 module.exports = Route;
 
 function Route(path) {
